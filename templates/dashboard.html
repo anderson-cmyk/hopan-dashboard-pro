@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CobHub - HO Pan Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #007AFF;
+            --secondary: #5856D6;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
+            --bg-primary: #000000;
+            --bg-secondary: #1C1C1E;
+            --bg-tertiary: #2C2C2E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8E8E93;
+            --border: #38383A;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .top-bar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-small {
+            height: 32px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .app-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .btn-logout {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .master-filter {
+            background: var(--bg-secondary);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .master-filter-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .master-filter select {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .master-filter select:hover {
+            border-color: var(--primary);
+            background: var(--bg-secondary);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.2);
+            border-color: var(--primary);
+        }
+
+        .kpi-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 16px;
+            padding: 24px;
+            color: var(--danger);
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .top-bar-left, .top-bar-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .user-info {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <img src="/static/logo.png" alt="CobHub" class="logo-small">
+            <span class="app-name">HO Pan Dashboard</span>
+        </div>
+        <div class="top-bar-right">
+            <div class="user-info">
+                <div class="user-avatar">{{ user_name[0] if user_name else 'U' }}</div>
+                <span class="user-name">{{ user_name }}</span>
+            </div>
+            <a href="/logout" class="btn-logout">Sair</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>HO Pan Arquivo de 2ª Quinzena</h1>
+            <p class="subtitle">Análise de Comissões - Sistema CobHub</p>
+        </header>
+
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Carregando dados do dashboard...</p>
+        </div>
+
+        <div id="dashboard-content" style="display: none;">
+            <!-- O conteúdo do dashboard será inserido aqui via JavaScript -->
+        </div>
+
+        <div id="error-container" style="display: none;">
+            <div class="error-message">
+                <h3>Erro ao carregar dados</h3>
+                <p id="error-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Carregar dados do dashboard
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/data');
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar dados');
+                }
+                
+                const data = await response.json();
+                
+                // Esconder loading
+                document.getElementById('loading').style.display = 'none';
+                
+                // Mostrar conteúdo
+                document.getElementById('dashboard-content').style.display = 'block';
+                
+                // Renderizar dashboard
+                renderDashboard(data);
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-container').style.display = 'block';
+                document.getElementById('error-text').textContent = error.message;
+            }
+        }
+
+        function renderDashboard(data) {
+            // TODO: Implementar renderização completa do dashboard
+            // Por enquanto, mostrar informações básicas
+            const content = document.getElementById('dashboard-content');
+            
+            content.innerHTML = `
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total de Registros</div>
+                        <div class="kpi-value">${data.metadados.total_registros.toLocaleString('pt-BR')}</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Meses Disponíveis</div>
+                        <div class="kpi-value">${data.metadados.meses_disponiveis.length}</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Última Atualização</div>
+                        <div class="kpi-value" style="font-size: 1.2rem;">${data.metadados.data_atualizacao}</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Dashboard em Desenvolvimento</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.8;">
+                        O dashboard completo está sendo migrado para esta nova plataforma profissional.
+                        Em breve, todas as funcionalidades estarão disponíveis com autenticação segura
+                        e integração com GCP Cloud Run.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Carregar ao iniciar
+        loadDashboard();
+    </script>
+</body>
+</html>
