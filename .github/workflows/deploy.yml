@@ -54,9 +54,9 @@ jobs:
             --region $REGION \
             --allow-unauthenticated \
             --set-env-vars="SECRET_KEY=${{ secrets.SECRET_KEY }}" \
-            --set-env-vars="GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" \
-            --set-env-vars="GITHUB_REPO=${{ secrets.GITHUB_REPO }}" \
-            --set-env-vars="GITHUB_USER=${{ secrets.GITHUB_USER }}" \
+            --set-env-vars="GITHUB_TOKEN=${{ secrets.GH_TOKEN }}" \
+            --set-env-vars="GITHUB_REPO=${{ secrets.GH_REPO }}" \
+            --set-env-vars="GITHUB_USER=${{ secrets.GH_USER }}" \
             --set-env-vars="ADMIN_PASSWORD_HASH=${{ secrets.ADMIN_PASSWORD_HASH }}" \
             --set-env-vars="ADDITIONAL_USERS=${{ secrets.ADDITIONAL_USERS }}" \
             --memory 1Gi \
