@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CobHub - HO Pan Dashboard</title>
+    <title>HO Pan Arquivo - Análise de Comissões</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
@@ -31,96 +31,12 @@
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
-            padding: 0;
-            margin: 0;
-        }
-
-        .top-bar {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .logo-small {
-            height: 32px;
-            width: auto;
-            filter: brightness(0) invert(1);
-        }
-
-        .app-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .top-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 16px;
-            background: var(--bg-tertiary);
-            border-radius: 12px;
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .user-name {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .btn-logout {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-logout:hover {
-            background: var(--danger);
-            border-color: var(--danger);
+            padding: 20px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
         }
 
         header {
@@ -142,25 +58,6 @@
         .subtitle {
             color: var(--text-secondary);
             font-size: 1.1rem;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
 
         .master-filter {
@@ -259,133 +156,1493 @@
             border-radius: 2px;
         }
 
-        .error-message {
-            background: rgba(255, 59, 48, 0.1);
-            border: 1px solid var(--danger);
-            border-radius: 16px;
-            padding: 24px;
-            color: var(--danger);
-            text-align: center;
-            margin: 40px 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
 
-        @media (max-width: 768px) {
-            .top-bar {
-                padding: 12px 16px;
-                flex-direction: column;
-                gap: 12px;
-            }
+        thead {
+            background: var(--bg-tertiary);
+        }
 
-            .top-bar-left, .top-bar-right {
-                width: 100%;
-                justify-content: space-between;
-            }
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
 
-            .user-info {
-                flex: 1;
-            }
+        .cell-with-bar {
+            position: relative;
+            background: linear-gradient(90deg, 
+                rgba(0, 122, 255, 0.25) 0%, 
+                rgba(0, 122, 255, 0.25) var(--bar-width, 0%), 
+                transparent var(--bar-width, 0%)
+            );
+        }
+
+        .cell-value {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cell-percent {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        select, button {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select:hover, button:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+        }
+
+        button {
+            background: var(--primary);
+            border: none;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #0051D5;
+            transform: translateY(-2px);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(52, 199, 89, 0.2); color: var(--success); }
+        .badge-warning { background: rgba(255, 149, 0, 0.2); color: var(--warning); }
+        .badge-danger { background: rgba(255, 59, 48, 0.2); color: var(--danger); }
+
+        .pivot-table-container {
+            overflow-x: auto;
+        }
+
+        .pivot-table {
+            min-width: 600px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .distribution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .distribution-card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .distribution-card h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        .month-analysis-table {
+            overflow-x: auto;
+        }
+
+        .month-analysis-table table {
+            min-width: 800px;
         }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <div class="top-bar-left">
-            <img src="/static/logo.png" alt="CobHub" class="logo-small">
-            <span class="app-name">HO Pan Dashboard</span>
-        </div>
-        <div class="top-bar-right">
-            <div class="user-info">
-                <div class="user-avatar">{{ user_name[0] if user_name else 'U' }}</div>
-                <span class="user-name">{{ user_name }}</span>
-            </div>
-            <a href="/logout" class="btn-logout">Sair</a>
-        </div>
-    </div>
+
+<div style="position: fixed; top: 0; right: 0; z-index: 10000; background: rgba(0,0,0,0.9); padding: 10px 20px; border-bottom-left-radius: 12px; border: 1px solid #007AFF;">
+    <span style="color: #8E8E93; margin-right: 15px;">Olá, <strong style="color: #FFFFFF;">{{ user_name }}</strong></span>
+    <a href="/logout" style="color: #FF3B30; text-decoration: none; font-weight: 600;">Sair</a>
+</div>
 
     <div class="container">
         <header>
-            <h1>HO Pan Arquivo de 2ª Quinzena</h1>
-            <p class="subtitle">Análise de Comissões - Sistema CobHub</p>
+            <h1>HO Pan</h1>
+            <p class="subtitle">Análise de Comissões e Atrasos</p>
         </header>
 
         <div id="loading" class="loading">
-            <div class="loading-spinner"></div>
-            <p>Carregando dados do dashboard...</p>
+            <div class="spinner"></div>
+            <p>Carregando dados...</p>
         </div>
 
-        <div id="dashboard-content" style="display: none;">
-            <!-- O conteúdo do dashboard será inserido aqui via JavaScript -->
-        </div>
+        <div id="content" style="display: none;">
+            <!-- Filtros Master -->
+            <div class="master-filter">
+                <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <span class="master-filter-label">🔍 Filtrar por Mês:</span>
+                        <select id="masterMonthFilter" onchange="applyMasterFilter()">
+                            <option value="all">Todos os Meses</option>
+                        </select>
+                    </div>
+                    <div>
+                        <span class="master-filter-label">📂 Filtrar por Origem:</span>
+                        <select id="masterOrigemFilter" onchange="applyMasterFilter()">
+                            <option value="all">Todos</option>
+                            <option value="1q">1ª Quinzena</option>
+                            <option value="2q">2ª Quinzena</option>
+                        </select>
+                    </div>
+                    <div>
+                        <span class="master-filter-label">💳 Canal de Pagamento:</span>
+                        <select id="masterCanalFilter" onchange="applyMasterFilter()">
+                            <option value="all">Todos</option>
+                            <option value="indireto">Indireto</option>
+                            <option value="direto">Direto</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-        <div id="error-container" style="display: none;">
-            <div class="error-message">
-                <h3>Erro ao carregar dados</h3>
-                <p id="error-text"></p>
+            <!-- KPIs Principais -->
+            <div class="kpi-grid" id="kpiGrid"></div>
+
+            <!-- Seção 1: Análise por Faixa de Atraso -->
+            <div class="section">
+                <h2 class="section-title">Análise por Faixa de Atraso</h2>
+                <div class="chart-container">
+                    <canvas id="faixasChart"></canvas>
+                </div>
+                <div id="faixasTable"></div>
+            </div>
+
+            <!-- Seção 2: Tabela Dinâmica -->
+            <div class="section">
+                <h2 class="section-title">Tabela Dinâmica Configurável</h2>
+                <div class="controls">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Linha:</label>
+                        <select id="pivotRow"></select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Coluna:</label>
+                        <select id="pivotCol"></select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Valor:</label>
+                        <select id="pivotValue"></select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Agregação:</label>
+                        <select id="pivotAgg">
+                            <option value="sum">Soma</option>
+                            <option value="avg">Média</option>
+                            <option value="count">Contagem</option>
+                            <option value="min">Mínimo</option>
+                            <option value="max">Máximo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Critério:</label>
+                        <select id="pivotCriterio">
+                            <option value="all">Todos</option>
+                            <optgroup label="Classe">
+                                <option value="classe_contact">Contact (< 90 dias)</option>
+                                <option value="classe_ativas1">Ativas 1 (91-180 dias)</option>
+                                <option value="classe_ativas2">Ativas 2 (> 181 dias)</option>
+                            </optgroup>
+                            <optgroup label="Tipo de Pagamento">
+                                <option value="tipo_parcial">Parcial (< R$ 3.000)</option>
+                                <option value="tipo_atualizacao">Atualização (R$ 3.001-8.000)</option>
+                                <option value="tipo_quitacao">Quitação (> R$ 8.000)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div style="align-self: flex-end;">
+                        <button onclick="updatePivotTable()">Atualizar Tabela</button>
+                    </div>
+                    <div style="align-self: flex-end;">
+                        <button onclick="exportPivotDataToCSV()" style="background: var(--success); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600;">
+                            📥 Exportar Dados Analíticos
+                        </button>
+                    </div>
+                </div>
+                <div class="pivot-table-container" id="pivotTableContainer"></div>
+            </div>
+
+            <!-- Seção 4: Distribuição Normal de Comissões -->
+            <div class="section">
+                <h2 class="section-title">Distribuição de % Comissão por Faixa</h2>
+                <div class="controls" style="margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Analisar por:</label>
+                        <select id="distributionType" onchange="renderDistributionAnalysis()">
+                            <option value="atraso">Faixa de Atraso</option>
+                            <option value="valor">Faixa de Valor</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+                <div class="distribution-grid" id="distributionStats"></div>
+            </div>
+
+            <!-- Seção 5: Análise Específica - Baixa Comissão -->
+            <div class="section">
+                <h2 class="section-title">Análise Específica: % da Base por Faixa de Comissão</h2>
+                <div class="controls" style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Faixa de Atraso:</label>
+                        <select id="lowCommAtrasoFilter" onchange="renderLowCommissionAnalysis()">
+                            <option value="all">Todas as Faixas</option>
+                            <option value="0-20 dias">0-20 dias</option>
+                            <option value="21-30 dias">21-30 dias</option>
+                            <option value="31-60 dias">31-60 dias</option>
+                            <option value="61-90 dias">61-90 dias</option>
+                            <option value="91-180 dias">91-180 dias</option>
+                            <option value="181-360 dias">181-360 dias</option>
+                            <option value="Maior que 360 dias">Maior que 360 dias</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Faixa de Valor:</label>
+                        <select id="lowCommValorFilter" onchange="renderLowCommissionAnalysis()">
+                            <option value="all">Todas as Faixas</option>
+                            <option value="1. Até R$ 1.000">Até R$ 1.000</option>
+                            <option value="2. R$ 1.001 a R$ 1.500">R$ 1.001 a R$ 1.500</option>
+                            <option value="3. R$ 1.501 a R$ 2.000">R$ 1.501 a R$ 2.000</option>
+                            <option value="4. R$ 2.001 a R$ 3.000">R$ 2.001 a R$ 3.000</option>
+                            <option value="5. R$ 3.001 a R$ 5.000">R$ 3.001 a R$ 5.000</option>
+                            <option value="6. R$ 5.001 a R$ 10.000">R$ 5.001 a R$ 10.000</option>
+                            <option value="7. Maior que R$ 10.000">Maior que R$ 10.000</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="lowCommissionTable"></div>
+            </div>
+
+            <!-- Seção 6: Visão Diária -->
+            <div class="section">
+                <h2 class="section-title">Visão Diária por Mês</h2>
+                <div class="controls" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Métrica:</label>
+                        <select id="dailyMetric" onchange="renderDailyView()">
+                            <option value="valorPago">Valor Pago</option>
+                            <option value="qtdContratos">Quantidade de Contratos</option>
+                            <option value="ticketMedio">Ticket Médio</option>
+                            <option value="valorComissao">Valor da Comissão</option>
+                            <option value="percComissao">% da Comissão</option>
+                            <option value="ticketMedioComissao">Ticket Médio da Comissão</option>
+                        </select>
+                    </div>
+                    <button onclick="exportDailyViewToCSV()" style="background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600;">
+                        📥 Exportar CSV
+                    </button>
+                </div>
+                <div id="dailyViewTable" style="overflow-x: auto;"></div>
+            </div>
+
+            <!-- Seção 7: Cardápio HO -->
+            <div class="section">
+                <h2 class="section-title">📋 Cardápio de HO Disponíveis</h2>
+                <div style="background: var(--bg-tertiary); border-radius: 12px; padding: 30px; text-align: center;">
+                    <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 20px;">
+                        Consulte o cardápio completo de operações HO (Honorários) disponíveis para análise.
+                    </p>
+                    <a href="https://pan-autos.manus.space/" target="_blank" 
+                       style="display: inline-block; background: linear-gradient(135deg, var(--primary), #0066cc); 
+                              color: white; padding: 15px 40px; border-radius: 12px; text-decoration: none; 
+                              font-size: 1.1rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+                              transition: all 0.3s ease;">
+                        🔗 Acessar Cardápio HO
+                    </a>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 15px;">
+                        O link abrirá em uma nova aba
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Carregar dados do dashboard
-        async function loadDashboard() {
-            try {
-                const response = await fetch('/api/data');
-                if (!response.ok) {
-                    throw new Error('Erro ao carregar dados');
+        let dashboardData = null;
+        let filteredData = null;
+        let currentMonth = 'all';
+
+        // Carregar dados
+        // Função auxiliar para adicionar campos calculados
+        function addCalculatedFields(data) {
+            return data.map(d => {
+                // Calcular Classe baseado em atraso
+                let classe;
+                if (d.Atraso < 90) {
+                    classe = 'Contact';
+                } else if (d.Atraso >= 91 && d.Atraso <= 180) {
+                    classe = 'Ativas 1';
+                } else {
+                    classe = 'Ativas 2';
                 }
                 
-                const data = await response.json();
+                // Calcular TipoPagamento baseado em valor
+                let tipoPagamento;
+                if (d.ValorPago < 3000) {
+                    tipoPagamento = 'Parcial';
+                } else if (d.ValorPago >= 3001 && d.ValorPago <= 8000) {
+                    tipoPagamento = 'Atualização';
+                } else {
+                    tipoPagamento = 'Quitação';
+                }
                 
-                // Esconder loading
-                document.getElementById('loading').style.display = 'none';
+                // Calcular CanalPagamento baseado em % de comissão
+                let canalPagamento;
+                if (d.PercComissao >= 3.6 && d.PercComissao <= 3.8) {
+                    canalPagamento = 'Indireto';
+                } else {
+                    canalPagamento = 'Direto';
+                }
                 
-                // Mostrar conteúdo
-                document.getElementById('dashboard-content').style.display = 'block';
+                // Definir Origem (todos os dados atuais são 2ª Quinzena)
+                const origem = d.Origem || '2q';
                 
-                // Renderizar dashboard
-                renderDashboard(data);
-                
+                return { ...d, Classe: classe, TipoPagamento: tipoPagamento, CanalPagamento: canalPagamento, Origem: origem };
+            });
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch('dashboard_data.json');
+                dashboardData = await response.json();
+                // Adicionar campos calculados logo após carregar
+                dashboardData.dados_completos = addCalculatedFields(dashboardData.dados_completos);
+                filteredData = dashboardData.dados_completos;
+                initializeDashboard();
             } catch (error) {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error-container').style.display = 'block';
-                document.getElementById('error-text').textContent = error.message;
+                console.error('Erro ao carregar dados:', error);
+                document.getElementById('loading').innerHTML = '<p style="color: var(--danger);">Erro ao carregar dados. Verifique o console.</p>';
             }
         }
 
-        function renderDashboard(data) {
-            // TODO: Implementar renderização completa do dashboard
-            // Por enquanto, mostrar informações básicas
-            const content = document.getElementById('dashboard-content');
-            
-            content.innerHTML = `
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Total de Registros</div>
-                        <div class="kpi-value">${data.metadados.total_registros.toLocaleString('pt-BR')}</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Meses Disponíveis</div>
-                        <div class="kpi-value">${data.metadados.meses_disponiveis.length}</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Última Atualização</div>
-                        <div class="kpi-value" style="font-size: 1.2rem;">${data.metadados.data_atualizacao}</div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2 class="section-title">Dashboard em Desenvolvimento</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.8;">
-                        O dashboard completo está sendo migrado para esta nova plataforma profissional.
-                        Em breve, todas as funcionalidades estarão disponíveis com autenticação segura
-                        e integração com GCP Cloud Run.
-                    </p>
-                </div>
-            `;
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { 
+                style: 'currency', 
+                currency: 'BRL' 
+            }).format(value);
         }
 
-        // Carregar ao iniciar
-        loadDashboard();
+        function formatPercent(value) {
+            return value.toFixed(2) + '%';
+        }
+
+        function formatNumber(value) {
+            return new Intl.NumberFormat('pt-BR').format(value);
+        }
+
+        // Função para criar célula com barra de representatividade baseada em valor pago
+        function createCellWithBar(value, formattedValue, valorPago, totalValorBase) {
+            const percent = totalValorBase > 0 ? (valorPago / totalValorBase) * 100 : 0;
+            const barWidth = Math.min(percent, 100);
+            
+            return `<td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                <span class="cell-value">${formattedValue} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+            </td>`;
+        }
+
+        // Calcular total de valor pago por mês
+        function getTotalValueByMonth(mes = null) {
+            if (mes) {
+                return filteredData.filter(d => d.MesAno === mes).reduce((sum, d) => sum + d.ValorPago, 0);
+            }
+            return filteredData.reduce((sum, d) => sum + d.ValorPago, 0);
+        }
+        
+        // Manter função antiga para compatibilidade (retorna quantidade)
+        function getTotalContractsByMonth(mes = null) {
+            if (mes) {
+                return filteredData.filter(d => d.MesAno === mes).length;
+            }
+            return filteredData.length;
+        }
+
+        function initializeDashboard() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+
+            // Campos calculados já foram adicionados em loadData()
+            populateMonthFilter();
+            renderKPIs();
+            renderFaixasAnalysis();
+            initializePivotTable();
+            renderDistributionAnalysis();
+            renderLowCommissionAnalysis();
+            renderDailyView();
+        }
+
+        function populateMonthFilter() {
+            const select = document.getElementById('masterMonthFilter');
+            const meses = dashboardData.metadados.meses_disponiveis || [];
+            
+            meses.forEach(mes => {
+                const option = document.createElement('option');
+                option.value = mes;
+                option.textContent = formatMonthYear(mes);
+                select.appendChild(option);
+            });
+        }
+
+        function formatMonthYear(mesAno) {
+            const [year, month] = mesAno.split('-');
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                          'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            return `${meses[parseInt(month) - 1]}/${year}`;
+        }
+
+        function applyMasterFilter() {
+            currentMonth = document.getElementById('masterMonthFilter').value;
+            const currentOrigem = document.getElementById('masterOrigemFilter').value;
+            const currentCanal = document.getElementById('masterCanalFilter').value;
+            
+            // Filtrar por mês
+            if (currentMonth === 'all') {
+                filteredData = dashboardData.dados_completos;
+            } else {
+                filteredData = dashboardData.dados_completos.filter(d => d.MesAno === currentMonth);
+            }
+            
+            // Filtrar por origem/quinzena
+            if (currentOrigem !== 'all') {
+                if (currentOrigem === '1q') {
+                    filteredData = filteredData.filter(d => d.Origem === '1ª Quinzena');
+                } else if (currentOrigem === '2q') {
+                    filteredData = filteredData.filter(d => d.Origem === '2ª Quinzena');
+                }
+            }
+            
+            // Filtrar por canal de pagamento
+            if (currentCanal !== 'all') {
+                if (currentCanal === 'indireto') {
+                    filteredData = filteredData.filter(d => d.CanalPagamento === 'Indireto');
+                } else if (currentCanal === 'direto') {
+                    filteredData = filteredData.filter(d => d.CanalPagamento === 'Direto');
+                }
+            }
+            
+            // Campos calculados já existem em dashboardData.dados_completos
+
+            renderKPIs();
+            renderFaixasAnalysis();
+            updatePivotTable();
+            renderDistributionAnalysis();
+            renderLowCommissionAnalysis();
+            renderDailyView();
+        }
+
+        function renderKPIs() {
+            const totalOps = filteredData.length;
+            const totalPago = filteredData.reduce((sum, d) => sum + d.ValorPago, 0);
+            const totalComissao = filteredData.reduce((sum, d) => sum + d.ValorComissao, 0);
+            const percComissao = (totalComissao / totalPago * 100);
+
+            const kpis = [
+                { label: 'Total de Operações', value: formatNumber(totalOps), color: 'var(--primary)' },
+                { label: 'Valor Total Pago', value: formatCurrency(totalPago), color: 'var(--success)' },
+                { label: 'Total Comissões', value: formatCurrency(totalComissao), color: 'var(--warning)' },
+                { label: '% Comissão Geral', value: formatPercent(percComissao), color: 'var(--secondary)' }
+            ];
+
+            const grid = document.getElementById('kpiGrid');
+            grid.innerHTML = kpis.map(kpi => `
+                <div class="kpi-card">
+                    <div class="kpi-label">${kpi.label}</div>
+                    <div class="kpi-value" style="color: ${kpi.color}">${kpi.value}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderFaixasAnalysis() {
+            const faixas = {};
+            const ordem = ['0-20 dias', '21-30 dias', '31-60 dias', '61-90 dias', 
+                          '91-180 dias', '181-360 dias', 'Maior que 360 dias'];
+
+            ordem.forEach(f => faixas[f] = { ops: 0, pago: 0, comissao: 0 });
+
+            filteredData.forEach(d => {
+                if (faixas[d.FaixaAtraso]) {
+                    faixas[d.FaixaAtraso].ops++;
+                    faixas[d.FaixaAtraso].pago += d.ValorPago;
+                    faixas[d.FaixaAtraso].comissao += d.ValorComissao;
+                }
+            });
+
+            const faixasArray = ordem.map(f => ({
+                faixa: f,
+                ops: faixas[f].ops,
+                pago: faixas[f].pago,
+                comissao: faixas[f].comissao,
+                perc: faixas[f].pago > 0 ? (faixas[f].comissao / faixas[f].pago * 100) : 0
+            }));
+
+            // Gráfico
+            const ctx = document.getElementById('faixasChart');
+            if (window.faixasChartInstance) {
+                window.faixasChartInstance.destroy();
+            }
+
+            window.faixasChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: faixasArray.map(f => f.faixa),
+                    datasets: [
+                        {
+                            label: 'Total Pago (R$)',
+                            data: faixasArray.map(f => f.pago),
+                            backgroundColor: 'rgba(0, 122, 255, 0.7)',
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Total Comissão (R$)',
+                            data: faixasArray.map(f => f.comissao),
+                            backgroundColor: 'rgba(255, 149, 0, 0.7)',
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '% Comissão',
+                            data: faixasArray.map(f => f.perc),
+                            type: 'line',
+                            borderColor: 'rgba(52, 199, 89, 1)',
+                            backgroundColor: 'rgba(52, 199, 89, 0.2)',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#FFFFFF' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            ticks: { color: '#8E8E93' },
+                            grid: { color: '#38383A' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            ticks: { color: '#8E8E93' },
+                            grid: { display: false }
+                        },
+                        x: {
+                            ticks: { color: '#8E8E93' },
+                            grid: { color: '#38383A' }
+                        }
+                    }
+                }
+            });
+
+            // Tabela com barras de representatividade baseadas em valor pago
+            const totalValorBase = getTotalValueByMonth();
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Faixa de Atraso</th>
+                            <th>Operações</th>
+                            <th>Total Pago</th>
+                            <th>Total Comissão</th>
+                            <th>% Comissão</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            faixasArray.forEach(f => {
+                const percent = totalValorBase > 0 ? (f.pago / totalValorBase) * 100 : 0;
+                const barWidth = Math.min(percent, 100);
+                
+                tableHTML += `
+                    <tr>
+                        <td><span class="badge ${getBadgeClass(f.faixa)}">${f.faixa}</span></td>
+                        <td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                            <span class="cell-value">${formatNumber(f.ops)} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                        </td>
+                        <td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                            <span class="cell-value">${formatCurrency(f.pago)} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                        </td>
+                        <td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                            <span class="cell-value">${formatCurrency(f.comissao)} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                        </td>
+                        <td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                            <span class="cell-value">${formatPercent(f.perc)} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                        </td>
+                    </tr>`;
+            });
+            
+            // Calcular totais
+            const totalOps = faixasArray.reduce((sum, f) => sum + f.ops, 0);
+            const totalPago = faixasArray.reduce((sum, f) => sum + f.pago, 0);
+            const totalComissao = faixasArray.reduce((sum, f) => sum + f.comissao, 0);
+            
+            // Linha de TOTAL
+            tableHTML += `
+                <tr style="background: var(--primary); color: white; font-weight: bold; border-top: 3px solid var(--success);">
+                    <td>TOTAL</td>
+                    <td><span class="cell-value">${formatNumber(totalOps)}</span></td>
+                    <td><span class="cell-value">${formatCurrency(totalPago)}</span></td>
+                    <td><span class="cell-value">${formatCurrency(totalComissao)}</span></td>
+                    <td><span class="cell-value">-</span></td>
+                </tr>`;
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('faixasTable').innerHTML = tableHTML;
+        }
+
+        function getBadgeClass(faixa) {
+            if (faixa.includes('0-20')) return 'badge-success';
+            if (faixa.includes('21-30') || faixa.includes('31-60')) return 'badge-warning';
+            return 'badge-danger';
+        }
+
+
+
+        function initializePivotTable() {
+            const camposNumericos = dashboardData.metadados.campos_numericos;
+            const camposCategoricos = ['FaixaAtraso', 'FaixaValor', 'MesAno', 'Classe', 'TipoPagamento'];
+
+            const rowSelect = document.getElementById('pivotRow');
+            const colSelect = document.getElementById('pivotCol');
+            const valueSelect = document.getElementById('pivotValue');
+
+            camposCategoricos.forEach(campo => {
+                rowSelect.innerHTML += `<option value="${campo}">${campo}</option>`;
+                colSelect.innerHTML += `<option value="${campo}">${campo}</option>`;
+            });
+
+            camposNumericos.forEach(campo => {
+                valueSelect.innerHTML += `<option value="${campo}">${campo}</option>`;
+            });
+
+            rowSelect.value = 'FaixaAtraso';
+            colSelect.value = 'FaixaValor';
+            valueSelect.value = 'ValorPago';
+
+            updatePivotTable();
+        }
+
+        function updatePivotTable() {
+            const rowField = document.getElementById('pivotRow').value;
+            const colField = document.getElementById('pivotCol').value;
+            const valueField = document.getElementById('pivotValue').value;
+            const aggType = document.getElementById('pivotAgg').value;
+            const criterio = document.getElementById('pivotCriterio').value;
+
+            // Aplicar filtro de critério
+            let data = filteredData;
+            if (criterio !== 'all') {
+                switch(criterio) {
+                    case 'classe_contact':
+                        data = data.filter(d => d.Classe === 'Contact');
+                        break;
+                    case 'classe_ativas1':
+                        data = data.filter(d => d.Classe === 'Ativas 1');
+                        break;
+                    case 'classe_ativas2':
+                        data = data.filter(d => d.Classe === 'Ativas 2');
+                        break;
+                    case 'tipo_parcial':
+                        data = data.filter(d => d.TipoPagamento === 'Parcial');
+                        break;
+                    case 'tipo_atualizacao':
+                        data = data.filter(d => d.TipoPagamento === 'Atualização');
+                        break;
+                    case 'tipo_quitacao':
+                        data = data.filter(d => d.TipoPagamento === 'Quitação');
+                        break;
+                }
+            }
+            const pivot = {};
+            const rowValues = new Set();
+            const colValues = new Set();
+
+            data.forEach(row => {
+                const rowVal = row[rowField];
+                const colVal = row[colField];
+                const value = row[valueField];
+
+                rowValues.add(rowVal);
+                colValues.add(colVal);
+
+                const key = `${rowVal}|||${colVal}`;
+                if (!pivot[key]) {
+                    pivot[key] = [];
+                }
+                pivot[key].push(value);
+            });
+
+            const aggregated = {};
+            for (const key in pivot) {
+                const values = pivot[key];
+                let result;
+                switch (aggType) {
+                    case 'sum':
+                        result = values.reduce((a, b) => a + b, 0);
+                        break;
+                    case 'avg':
+                        result = values.reduce((a, b) => a + b, 0) / values.length;
+                        break;
+                    case 'count':
+                        result = values.length;
+                        break;
+                    case 'min':
+                        result = Math.min(...values);
+                        break;
+                    case 'max':
+                        result = Math.max(...values);
+                        break;
+                }
+                aggregated[key] = result;
+            }
+
+            // Função de ordenação customizada para faixas
+            const customSort = (a, b, field) => {
+                if (field === 'FaixaAtraso') {
+                    const ordemAtraso = ['0-20 dias', '21-30 dias', '31-60 dias', '61-90 dias', 
+                                        '91-180 dias', '181-360 dias', 'Maior que 360 dias'];
+                    return ordemAtraso.indexOf(a) - ordemAtraso.indexOf(b);
+                } else if (field === 'FaixaValor') {
+                    const ordemValor = [
+                        '1. Até R$ 1.000',
+                        '2. R$ 1.001 a R$ 1.500',
+                        '3. R$ 1.501 a R$ 2.000',
+                        '4. R$ 2.001 a R$ 3.000',
+                        '5. R$ 3.001 a R$ 5.000',
+                        '6. R$ 5.001 a R$ 10.000',
+                        '7. Maior que R$ 10.000'
+                    ];
+                    return ordemValor.indexOf(a) - ordemValor.indexOf(b);
+                } else {
+                    return a.localeCompare(b);
+                }
+            };
+
+            const sortedRows = Array.from(rowValues).sort((a, b) => customSort(a, b, rowField));
+            const sortedCols = Array.from(colValues).sort((a, b) => customSort(a, b, colField));
+
+            // Calcular totais de linhas e colunas
+            const rowTotals = {};
+            const colTotals = {};
+            let grandTotal = 0;
+
+            sortedRows.forEach(row => {
+                let rowTotal = 0;
+                sortedCols.forEach(col => {
+                    const key = `${row}|||${col}`;
+                    const value = aggregated[key] || 0;
+                    rowTotal += value;
+                    colTotals[col] = (colTotals[col] || 0) + value;
+                    grandTotal += value;
+                });
+                rowTotals[row] = rowTotal;
+            });
+
+            let tableHTML = '<table class="pivot-table"><thead><tr><th></th>';
+            sortedCols.forEach(col => {
+                tableHTML += `<th>${col}</th>`;
+            });
+            tableHTML += '<th style="background: var(--primary); color: white; font-weight: bold;">TOTAL LINHA</th>';
+            tableHTML += '</tr></thead><tbody>';
+
+            // Calcular total base considerando se há mês nas dimensões
+            const hasMesInDimensions = rowField === 'MesAno' || colField === 'MesAno';
+            
+            sortedRows.forEach(row => {
+                tableHTML += `<tr><th>${row}</th>`;
+                sortedCols.forEach(col => {
+                    const key = `${row}|||${col}`;
+                    const value = aggregated[key] || 0;
+                    
+                    // Formatação condicional baseada no campo
+                    let formatted;
+                    if (valueField === 'PercComissao') {
+                        formatted = formatPercent(value);
+                    } else if (valueField.includes('Valor') || valueField.includes('Comissao') || valueField.includes('Base')) {
+                        formatted = formatCurrency(value);
+                    } else if (valueField.includes('Perc')) {
+                        formatted = formatPercent(value);
+                    } else {
+                        formatted = formatNumber(value);
+                    }
+                    
+                    // Calcular representatividade
+                    let totalValorBase;
+                    if (hasMesInDimensions) {
+                        const mes = rowField === 'MesAno' ? row : (colField === 'MesAno' ? col : null);
+                        totalValorBase = mes ? getTotalValueByMonth(mes) : getTotalValueByMonth();
+                    } else {
+                        totalValorBase = getTotalValueByMonth();
+                    }
+                    
+                    const cellData = data.filter(d => d[rowField] === row && d[colField] === col);
+                    const valorPagoCelula = cellData.reduce((sum, d) => sum + d.ValorPago, 0);
+                    const percent = totalValorBase > 0 ? (valorPagoCelula / totalValorBase) * 100 : 0;
+                    const barWidth = Math.min(percent, 100);
+                    
+                    tableHTML += `<td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                        <span class="cell-value">${formatted} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                    </td>`;
+                });
+                
+                // Total da linha
+                const rowTotal = rowTotals[row];
+                let formattedRowTotal;
+                
+                // Não mostrar total para PercComissao (não faz sentido somar percentuais)
+                if (valueField === 'PercComissao' || valueField.includes('Perc')) {
+                    formattedRowTotal = '-';
+                } else if (valueField.includes('Valor') || valueField.includes('Comissao') || valueField.includes('Base')) {
+                    formattedRowTotal = formatCurrency(rowTotal);
+                } else {
+                    formattedRowTotal = formatNumber(rowTotal);
+                }
+                
+                tableHTML += `<td style="background: var(--bg-tertiary); font-weight: bold; border-left: 2px solid var(--primary);">
+                    <span class="cell-value">${formattedRowTotal}</span>
+                </td>`;
+                tableHTML += '</tr>';
+            });
+
+            // Linha de totais de colunas
+            tableHTML += '<tr style="background: var(--primary); color: white; font-weight: bold;">';
+            tableHTML += '<th>TOTAL COLUNA</th>';
+            
+            sortedCols.forEach(col => {
+                const colTotal = colTotals[col];
+                let formattedColTotal;
+                
+                // Não mostrar total para PercComissao (não faz sentido somar percentuais)
+                if (valueField === 'PercComissao' || valueField.includes('Perc')) {
+                    formattedColTotal = '-';
+                } else if (valueField.includes('Valor') || valueField.includes('Comissao') || valueField.includes('Base')) {
+                    formattedColTotal = formatCurrency(colTotal);
+                } else {
+                    formattedColTotal = formatNumber(colTotal);
+                }
+                tableHTML += `<td>${formattedColTotal}</td>`;
+            });
+            
+            // Total geral (grand total)
+            let formattedGrandTotal;
+            
+            // Não mostrar total para PercComissao (não faz sentido somar percentuais)
+            if (valueField === 'PercComissao' || valueField.includes('Perc')) {
+                formattedGrandTotal = '-';
+            } else if (valueField.includes('Valor') || valueField.includes('Comissao') || valueField.includes('Base')) {
+                formattedGrandTotal = formatCurrency(grandTotal);
+            } else {
+                formattedGrandTotal = formatNumber(grandTotal);
+            }
+            
+            tableHTML += `<td style="background: var(--success); font-size: 1.1em; border: 2px solid white;">
+                ${formattedGrandTotal}
+            </td>`;
+            tableHTML += '</tr>';
+
+            tableHTML += '</tbody></table>';
+            document.getElementById('pivotTableContainer').innerHTML = tableHTML;
+        }
+
+        function renderDistributionAnalysis() {
+            const tipo = document.getElementById('distributionType').value;
+            const faixasPorMes = {};
+            let ordem, campoFaixa, tituloFaixa;
+
+            // Definir ordem e campo baseado no tipo selecionado
+            if (tipo === 'atraso') {
+                ordem = ['0-20 dias', '21-30 dias', '31-60 dias', '61-90 dias', 
+                        '91-180 dias', '181-360 dias', 'Maior que 360 dias'];
+                campoFaixa = 'FaixaAtraso';
+                tituloFaixa = 'Faixa de Atraso';
+            } else {
+                ordem = [
+                    '1. Até R$ 1.000',
+                    '2. R$ 1.001 a R$ 1.500',
+                    '3. R$ 1.501 a R$ 2.000',
+                    '4. R$ 2.001 a R$ 3.000',
+                    '5. R$ 3.001 a R$ 5.000',
+                    '6. R$ 5.001 a R$ 10.000',
+                    '7. Maior que R$ 10.000'
+                ];
+                campoFaixa = 'FaixaValor';
+                tituloFaixa = 'Faixa de Valor';
+            }
+            
+            const meses = dashboardData.metadados.meses_disponiveis || [];
+
+            // Inicializar estrutura
+            meses.forEach(mes => {
+                faixasPorMes[mes] = {};
+                ordem.forEach(f => faixasPorMes[mes][f] = []);
+            });
+
+            // Preencher dados
+            filteredData.forEach(d => {
+                const faixaValor = d[campoFaixa];
+                if (faixasPorMes[d.MesAno] && faixasPorMes[d.MesAno][faixaValor] !== undefined) {
+                    faixasPorMes[d.MesAno][faixaValor].push(d.PercComissao);
+                }
+            });
+
+            // Remover gráfico (não será mais usado)
+            const chartContainer = document.getElementById('distributionChart').parentElement;
+            chartContainer.style.display = 'none';
+
+            // Criar tabela de estatísticas por mês
+            let statsHTML = '<div style="overflow-x: auto;"><table><thead><tr><th>' + tituloFaixa + '</th><th>Estatística</th>';
+            
+            meses.forEach(mes => {
+                statsHTML += `<th>${formatMonthYear(mes)}</th>`;
+            });
+            statsHTML += '</tr></thead><tbody>';
+
+            ordem.forEach(faixa => {
+                // Linha de Média
+                statsHTML += `<tr><td rowspan="5"><strong>${faixa}</strong></td><td>Média</td>`;
+                meses.forEach(mes => {
+                    const valores = faixasPorMes[mes][faixa];
+                    if (valores.length > 0) {
+                        const media = valores.reduce((a, b) => a + b, 0) / valores.length;
+                        statsHTML += `<td>${formatPercent(media)}</td>`;
+                    } else {
+                        statsHTML += `<td>-</td>`;
+                    }
+                });
+                statsHTML += '</tr>';
+
+                // Linha de Mediana
+                statsHTML += `<tr><td>Mediana</td>`;
+                meses.forEach(mes => {
+                    const valores = faixasPorMes[mes][faixa];
+                    if (valores.length > 0) {
+                        const sorted = [...valores].sort((a, b) => a - b);
+                        const mediana = sorted[Math.floor(sorted.length / 2)];
+                        statsHTML += `<td>${formatPercent(mediana)}</td>`;
+                    } else {
+                        statsHTML += `<td>-</td>`;
+                    }
+                });
+                statsHTML += '</tr>';
+
+                // Linha de Mínimo
+                statsHTML += `<tr><td>Mínimo</td>`;
+                meses.forEach(mes => {
+                    const valores = faixasPorMes[mes][faixa];
+                    if (valores.length > 0) {
+                        const min = Math.min(...valores);
+                        statsHTML += `<td>${formatPercent(min)}</td>`;
+                    } else {
+                        statsHTML += `<td>-</td>`;
+                    }
+                });
+                statsHTML += '</tr>';
+
+                // Linha de Máximo
+                statsHTML += `<tr><td>Máximo</td>`;
+                meses.forEach(mes => {
+                    const valores = faixasPorMes[mes][faixa];
+                    if (valores.length > 0) {
+                        const max = Math.max(...valores);
+                        statsHTML += `<td>${formatPercent(max)}</td>`;
+                    } else {
+                        statsHTML += `<td>-</td>`;
+                    }
+                });
+                statsHTML += '</tr>';
+
+                // Linha de Desvio Padrão
+                statsHTML += `<tr><td>Desvio Padrão</td>`;
+                meses.forEach(mes => {
+                    const valores = faixasPorMes[mes][faixa];
+                    if (valores.length > 0) {
+                        const media = valores.reduce((a, b) => a + b, 0) / valores.length;
+                        const std = Math.sqrt(valores.reduce((sum, val) => sum + Math.pow(val - media, 2), 0) / valores.length);
+                        statsHTML += `<td>${formatPercent(std)}</td>`;
+                    } else {
+                        statsHTML += `<td>-</td>`;
+                    }
+                });
+                statsHTML += '</tr>';
+            });
+
+            statsHTML += '</tbody></table></div>';
+            document.getElementById('distributionStats').innerHTML = statsHTML;
+        }
+
+        function renderLowCommissionAnalysis() {
+            const atrasoFilter = document.getElementById('lowCommAtrasoFilter').value;
+            const valorFilter = document.getElementById('lowCommValorFilter').value;
+
+            // Filtrar dados baseado nos filtros selecionados
+            let dadosFiltrados = filteredData;
+
+            if (atrasoFilter !== 'all') {
+                dadosFiltrados = dadosFiltrados.filter(d => d.FaixaAtraso === atrasoFilter);
+            }
+
+            if (valorFilter !== 'all') {
+                dadosFiltrados = dadosFiltrados.filter(d => d.FaixaValor === valorFilter);
+            }
+
+            // Definir faixas de % comissão
+            const faixasComissao = [
+                // Comissões Baixas
+                { label: 'Menor que 1%', min: 0, max: 1 },
+                { label: '1,01% a 2%', min: 1.01, max: 2 },
+                { label: '2,01% a 3%', min: 2.01, max: 3 },
+                // Comissões Intermediárias
+                { label: '3,01% a 3,5%', min: 3.01, max: 3.5 },
+                { label: '3,51% a 3,75%', min: 3.51, max: 3.75 },
+                { label: '3,76% a 4%', min: 3.76, max: 4 },
+                { label: '4,01% a 5%', min: 4.01, max: 5 },
+                { label: '5% a 8%', min: 5, max: 8 },
+                { label: '8,01% a 9,99%', min: 8.01, max: 9.99 },
+                // Comissões Altas
+                { label: '10% a 13%', min: 10, max: 13 },
+                { label: '13,01% a 15%', min: 13.01, max: 15 },
+                { label: 'Maior que 15,01%', min: 15.01, max: 999 }
+            ];
+
+            const meses = dashboardData.metadados.meses_disponiveis || [];
+
+            // Agrupar dados por mês e faixa de comissão
+            const analise = {};
+            
+            meses.forEach(mes => {
+                const dadosMes = dadosFiltrados.filter(d => d.MesAno === mes);
+                const totalMes = dadosMes.length;
+
+                analise[mes] = {};
+
+                faixasComissao.forEach(faixa => {
+                    const dadosFaixa = dadosMes.filter(d => 
+                        d.PercComissao >= faixa.min && d.PercComissao <= faixa.max
+                    );
+
+                    const qtdContratos = dadosFaixa.length;
+                    const percBase = totalMes > 0 ? (qtdContratos / totalMes) * 100 : 0;
+                    const valorPago = dadosFaixa.reduce((sum, d) => sum + d.ValorPago, 0);
+                    const valorComissao = dadosFaixa.reduce((sum, d) => sum + d.ValorComissao, 0);
+
+                    analise[mes][faixa.label] = {
+                        qtdContratos,
+                        percBase,
+                        valorPago,
+                        valorComissao
+                    };
+                });
+            });
+
+            // Criar tabela HTML
+            let tableHTML = '<div style="overflow-x: auto;"><table><thead><tr>';
+            tableHTML += '<th>Faixa % Comissão</th><th>Métrica</th>';
+            
+            meses.forEach(mes => {
+                tableHTML += `<th>${formatMonthYear(mes)}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            faixasComissao.forEach(faixa => {
+                // Linha 1: Quantidade de Contratos
+                tableHTML += `<tr><td rowspan="4"><strong>${faixa.label}</strong></td><td>Qtd. Contratos</td>`;
+                meses.forEach(mes => {
+                    const dados = analise[mes][faixa.label];
+                    const totalValorMes = getTotalValueByMonth(mes);
+                    const percent = totalValorMes > 0 ? (dados.valorPago / totalValorMes) * 100 : 0;
+                    const barWidth = Math.min(percent, 100);
+                    tableHTML += `<td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                        <span class="cell-value">${formatNumber(dados.qtdContratos)} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                    </td>`;
+                });
+                tableHTML += '</tr>';
+
+                // Linha 2: % da Base
+                tableHTML += `<tr><td>% da Base</td>`;
+                meses.forEach(mes => {
+                    const dados = analise[mes][faixa.label];
+                    const totalValorMes = getTotalValueByMonth(mes);
+                    const percent = totalValorMes > 0 ? (dados.valorPago / totalValorMes) * 100 : 0;
+                    const barWidth = Math.min(percent, 100);
+                    tableHTML += `<td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                        <span class="cell-value">${formatPercent(dados.percBase)} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                    </td>`;
+                });
+                tableHTML += '</tr>';
+
+                // Linha 3: Valor Pago
+                tableHTML += `<tr><td>Valor Pago</td>`;
+                meses.forEach(mes => {
+                    const dados = analise[mes][faixa.label];
+                    const totalValorMes = getTotalValueByMonth(mes);
+                    const percent = totalValorMes > 0 ? (dados.valorPago / totalValorMes) * 100 : 0;
+                    const barWidth = Math.min(percent, 100);
+                    tableHTML += `<td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                        <span class="cell-value">${formatCurrency(dados.valorPago)} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                    </td>`;
+                });
+                tableHTML += '</tr>';
+
+                // Linha 4: Valor Comissão
+                tableHTML += `<tr><td>Valor Comissão</td>`;
+                meses.forEach(mes => {
+                    const dados = analise[mes][faixa.label];
+                    const totalValorMes = getTotalValueByMonth(mes);
+                    const percent = totalValorMes > 0 ? (dados.valorPago / totalValorMes) * 100 : 0;
+                    const barWidth = Math.min(percent, 100);
+                    tableHTML += `<td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                        <span class="cell-value">${formatCurrency(dados.valorComissao)} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                    </td>`;
+                });
+                tableHTML += '</tr>';
+            });
+
+            tableHTML += '</tbody></table></div>';
+            document.getElementById('lowCommissionTable').innerHTML = tableHTML;
+        }
+
+        function renderDailyView() {
+            const metrica = document.getElementById('dailyMetric').value;
+            
+            // Agrupar dados por mês e dia
+            const meses = dashboardData.metadados.meses_disponiveis || [];
+            const dadosPorDia = {};
+
+            // Inicializar estrutura para todos os dias (1-31) e meses
+            for (let dia = 1; dia <= 31; dia++) {
+                dadosPorDia[dia] = {};
+                meses.forEach(mes => {
+                    dadosPorDia[dia][mes] = {
+                        valorPago: 0,
+                        valorComissao: 0,
+                        qtdContratos: 0
+                    };
+                });
+            }
+
+            // Preencher dados
+            filteredData.forEach(d => {
+                const data = new Date(d.Data_Base);
+                const dia = data.getDate();
+                const mes = d.MesAno;
+
+                if (dadosPorDia[dia] && dadosPorDia[dia][mes]) {
+                    dadosPorDia[dia][mes].valorPago += d.ValorPago;
+                    dadosPorDia[dia][mes].valorComissao += d.ValorComissao;
+                    dadosPorDia[dia][mes].qtdContratos += 1;
+                }
+            });
+
+            // Calcular métricas derivadas
+            for (let dia = 1; dia <= 31; dia++) {
+                meses.forEach(mes => {
+                    const dados = dadosPorDia[dia][mes];
+                    dados.ticketMedio = dados.qtdContratos > 0 ? dados.valorPago / dados.qtdContratos : 0;
+                    dados.percComissao = dados.valorPago > 0 ? (dados.valorComissao / dados.valorPago) * 100 : 0;
+                    dados.ticketMedioComissao = dados.qtdContratos > 0 ? dados.valorComissao / dados.qtdContratos : 0;
+                });
+            }
+
+            // Criar tabela HTML
+            let tableHTML = '<table><thead><tr><th>Dia</th>';
+            
+            meses.forEach(mes => {
+                const [year, month] = mes.split('-');
+                tableHTML += `<th>${month}/${year}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            for (let dia = 1; dia <= 31; dia++) {
+                tableHTML += `<tr><td><strong>${dia}</strong></td>`;
+                
+                meses.forEach(mes => {
+                    const dados = dadosPorDia[dia][mes];
+                    const valor = dados[metrica];
+                    const qtdContratos = dados.qtdContratos;
+                    let formatted;
+
+                    if (valor === 0 || qtdContratos === 0) {
+                        tableHTML += `<td>-</td>`;
+                    } else {
+                        switch(metrica) {
+                            case 'valorPago':
+                            case 'valorComissao':
+                            case 'ticketMedio':
+                            case 'ticketMedioComissao':
+                                formatted = formatCurrency(valor);
+                                break;
+                            case 'percComissao':
+                                formatted = formatPercent(valor);
+                                break;
+                            case 'qtdContratos':
+                                formatted = formatNumber(valor);
+                                break;
+                        }
+                        
+                        // Calcular representatividade baseada no valor pago do mês da coluna
+                        const totalValorMes = getTotalValueByMonth(mes);
+                        const percent = totalValorMes > 0 ? (dados.valorPago / totalValorMes) * 100 : 0;
+                        const barWidth = Math.min(percent, 100);
+                        
+                        tableHTML += `<td class="cell-with-bar" style="--bar-width: ${barWidth}%">
+                            <span class="cell-value">${formatted} <span class="cell-percent">(${percent.toFixed(1)}%)</span></span>
+                        </td>`;
+                    }
+                });
+                
+                tableHTML += '</tr>';
+            }
+
+            tableHTML += '</tbody></table>';
+            document.getElementById('dailyViewTable').innerHTML = tableHTML;
+
+            // Armazenar dados para exportação
+            window.dailyViewData = { dadosPorDia, meses, metrica };
+        }
+
+        function exportDailyViewToCSV() {
+            if (!window.dailyViewData) {
+                alert('Nenhum dado para exportar');
+                return;
+            }
+
+            const { dadosPorDia, meses, metrica } = window.dailyViewData;
+            
+            // Criar CSV
+            let csv = 'Dia';
+            meses.forEach(mes => {
+                const [year, month] = mes.split('-');
+                csv += `,${month}/${year}`;
+            });
+            csv += '\n';
+
+            for (let dia = 1; dia <= 31; dia++) {
+                csv += dia;
+                
+                meses.forEach(mes => {
+                    const valor = dadosPorDia[dia][mes][metrica];
+                    csv += `,${valor === 0 ? '' : valor.toFixed(2)}`;
+                });
+                
+                csv += '\n';
+            }
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const metricaLabels = {
+                'valorPago': 'Valor_Pago',
+                'qtdContratos': 'Quantidade_Contratos',
+                'ticketMedio': 'Ticket_Medio',
+                'valorComissao': 'Valor_Comissao',
+                'percComissao': 'Percentual_Comissao',
+                'ticketMedioComissao': 'Ticket_Medio_Comissao'
+            };
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', `visao_diaria_${metricaLabels[metrica]}_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportPivotDataToCSV() {
+            const criterio = document.getElementById('pivotCriterio').value;
+            const rowField = document.getElementById('pivotRow').value;
+            const colField = document.getElementById('pivotCol').value;
+            
+            // Aplicar mesmo filtro de critério usado na tabela dinâmica
+            let dataToExport = filteredData;
+            if (criterio !== 'all') {
+                switch(criterio) {
+                    case 'classe_contact':
+                        dataToExport = dataToExport.filter(d => d.Classe === 'Contact');
+                        break;
+                    case 'classe_ativas1':
+                        dataToExport = dataToExport.filter(d => d.Classe === 'Ativas 1');
+                        break;
+                    case 'classe_ativas2':
+                        dataToExport = dataToExport.filter(d => d.Classe === 'Ativas 2');
+                        break;
+                    case 'tipo_parcial':
+                        dataToExport = dataToExport.filter(d => d.TipoPagamento === 'Parcial');
+                        break;
+                    case 'tipo_atualizacao':
+                        dataToExport = dataToExport.filter(d => d.TipoPagamento === 'Atualização');
+                        break;
+                    case 'tipo_quitacao':
+                        dataToExport = dataToExport.filter(d => d.TipoPagamento === 'Quitação');
+                        break;
+                }
+            }
+            
+            if (dataToExport.length === 0) {
+                alert('Nenhum dado para exportar com os filtros selecionados');
+                return;
+            }
+            
+            // Mapear nomes dos campos para labels amigáveis
+            const fieldLabels = {
+                'FaixaAtraso': 'Faixa de Atraso',
+                'FaixaValor': 'Faixa de Valor',
+                'MesAno': 'Mês/Ano',
+                'Classe': 'Classe',
+                'TipoPagamento': 'Tipo de Pagamento'
+            };
+            
+            // Mapear critérios para labels amigáveis
+            const criterioLabels = {
+                'all': 'Todos',
+                'classe_contact': 'Contact (< 90 dias)',
+                'classe_ativas1': 'Ativas 1 (91-180 dias)',
+                'classe_ativas2': 'Ativas 2 (> 181 dias)',
+                'tipo_parcial': 'Parcial (< R$ 3.000)',
+                'tipo_atualizacao': 'Atualização (R$ 3.001-8.000)',
+                'tipo_quitacao': 'Quitação (> R$ 8.000)'
+            };
+            
+            // Criar CSV com cabeçalho dinâmico
+            const rowLabel = fieldLabels[rowField] || rowField;
+            const colLabel = fieldLabels[colField] || colField;
+            const criterioTexto = criterioLabels[criterio] || criterio;
+            let csv = `Proposta,Cliente,Valor Pago,Valor Comissão,Data,Linha (${rowLabel}),Coluna (${colLabel}),Critério,Canal de Pagamento\n`;
+            
+            // Adicionar dados
+            dataToExport.forEach(d => {
+                const proposta = d.Prop || '';
+                const cliente = d.Cliente || '';
+                const valorPago = d.ValorPago.toFixed(2);
+                const valorComissao = d.ValorComissao.toFixed(2);
+                const data = d.Data_Base || '';
+                const linhaValor = d[rowField] || '';
+                const colunaValor = d[colField] || '';
+                const canalPagamento = d.CanalPagamento || '';
+                
+                csv += `${proposta},"${cliente}",${valorPago},${valorComissao},${data},"${linhaValor}","${colunaValor}","${criterioTexto}","${canalPagamento}"\n`;
+            });
+            
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const criterioLabel = criterio === 'all' ? 'todos' : criterio.replace('_', '-');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `dados_analiticos_${criterioLabel}_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function createHistogramData(values) {
+            const bins = [0, 2, 4, 6, 8, 10, 12, 15, Infinity];
+            const counts = new Array(bins.length - 1).fill(0);
+
+            values.forEach(val => {
+                for (let i = 0; i < bins.length - 1; i++) {
+                    if (val >= bins[i] && val < bins[i + 1]) {
+                        counts[i]++;
+                        break;
+                    }
+                }
+            });
+
+            return counts;
+        }
+
+        window.addEventListener('load', loadData);
     </script>
 </body>
 </html>
